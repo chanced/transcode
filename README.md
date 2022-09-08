@@ -1,4 +1,4 @@
-# why is a small yaml utility library
+# why is a yaml/json conversion library
 
 why encodes yaml into json and json into yaml all while preserving the structure of the data.
 
