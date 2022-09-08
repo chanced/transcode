@@ -1,0 +1,9 @@
+- unquoted
+- "double quotes"
+- "single quotes"
+- |
+    multiline
+    keep newlines
+- >
+    multiline
+    folded
