@@ -1,6 +1,6 @@
 # why is a yaml/json conversion library
 
-why encodes yaml into json and vice versa all while preserving the structure of the data.
+why encodes yaml into json and vice versa while preserving the order and structure of the data.
 
 -   aliases are not supported.
 -   comments are obviously lost
