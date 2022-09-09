@@ -10,7 +10,7 @@ import (
 	yaml "gopkg.in/yaml.v3"
 )
 
-const INDENTION string = "    "
+const indention string = "    "
 
 func YAMLToJSON(yamlData []byte) ([]byte, error) {
 	var yn yaml.Node
@@ -172,7 +172,7 @@ func (j jsonnode) encodeObject(r gjson.Result, indent int) ([]byte, error) {
 		if b.Len() > 0 || indent > 0 {
 			b.WriteByte('\n')
 			for i := 0; i < indent; i++ {
-				b.WriteString(INDENTION)
+				b.WriteString(indention)
 			}
 		}
 		b.WriteString(key.String())
@@ -197,7 +197,7 @@ func (j jsonnode) encodeArray(r gjson.Result, indent int) ([]byte, error) {
 		if b.Len() > 0 || indent > 0 {
 			b.WriteByte('\n')
 			for i := 0; i < indent; i++ {
-				b.WriteString(INDENTION)
+				b.WriteString(indention)
 			}
 		}
 		b.WriteString("- ")
