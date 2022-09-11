@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/chanced/why"
+	why "github.com/chanced/transcodefmt"
 	"github.com/google/go-cmp/cmp"
 	"gopkg.in/yaml.v3"
 )
