@@ -1,4 +1,4 @@
-package why_test
+package transcodefmt_test
 
 import (
 	"embed"
@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	why "github.com/chanced/transcodefmt"
+	"github.com/chanced/transcodefmt"
 	"github.com/google/go-cmp/cmp"
 	"gopkg.in/yaml.v3"
 )
@@ -47,7 +47,7 @@ func Test(t *testing.T) {
 			// 	t.Fatal(err)
 			// }
 
-			jsonData, err := why.YAMLToJSON(yamlData)
+			jsonData, err := transcodefmt.YAMLToJSON(yamlData)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -58,7 +58,7 @@ func Test(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			yamlFromJSON, err := why.JSONToYAML(jsonData)
+			yamlFromJSON, err := transcodefmt.JSONToYAML(jsonData)
 			if err != nil {
 				t.Fatal(err)
 			}
