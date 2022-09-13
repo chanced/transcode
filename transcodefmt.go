@@ -61,8 +61,13 @@ func (y yamlnode) encodeMapping() ([]byte, error) {
 	if len(y.Content)%2 != 0 {
 		return nil, fmt.Errorf("mapping node has odd number of children")
 	}
-	b := []byte("{}")
+	b := strings.Builder{}
+	b.WriteByte('{')
+
 	for i := 0; i < len(y.Content); i += 2 {
+		if b.Len() > 1 {
+			b.WriteByte(',')
+		}
 		k, err := yamlnode{y.Content[i]}.encodeKey()
 		if err != nil {
 			return nil, err
@@ -71,13 +76,14 @@ func (y yamlnode) encodeMapping() ([]byte, error) {
 		if err != nil {
 			return nil, err
 		}
-		b, err = sjson.SetRawBytes(b, string(k), v)
-		if err != nil {
-			return nil, err
-		}
-	}
 
-	return b, nil
+		b.WriteString(k)
+		b.WriteByte(':')
+		b.Write(v)
+	}
+	b.WriteByte('}')
+	// fmt.Println(b.String())
+	return []byte(b.String()), nil
 }
 
 func (y yamlnode) encodeKey() (string, error) {
@@ -179,7 +185,15 @@ func (j jsonnode) encodeObject(r gjson.Result, indent int) ([]byte, error) {
 				b.WriteString(indention)
 			}
 		}
-		b.WriteString(key.String())
+		kstr := key.String()
+		switch {
+		case isNumber([]byte(kstr)), kstr == "true", kstr == "false", kstr == "null":
+			b.WriteByte('"')
+			b.WriteString(key.String())
+			b.WriteByte('"')
+		default:
+			b.WriteString(key.String())
+		}
 
 		b.WriteByte(':')
 		b.WriteByte(' ')

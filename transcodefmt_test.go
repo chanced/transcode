@@ -3,7 +3,10 @@ package transcodefmt_test
 import (
 	"embed"
 	"encoding/json"
+	"fmt"
 	"io/fs"
+	"log"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -54,13 +57,21 @@ func Test(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-
+			op := filepath.Join("testoutput", name+".json")
+			err = os.MkdirAll(filepath.Dir(op), 0o755)
+			if err != nil {
+				log.Fatal(err)
+			}
+			err = os.WriteFile(op, jsonData, 0o644)
+			if err != nil {
+				log.Fatal(err)
+			}
 			var actualJSON interface{}
 			err = json.Unmarshal(jsonData, &actualJSON)
 			if err != nil {
 				t.Fatal(err)
 			}
-
+			fmt.Println(string(jsonData))
 			yamlFromJSON, err := transcodefmt.JSONToYAML(jsonData)
 			if err != nil {
 				t.Fatal(err)
@@ -75,7 +86,9 @@ func Test(t *testing.T) {
 			if diff := cmp.Diff(expectedYAML, actualYAML); diff != "" {
 				t.Errorf("yaml mismatch:\n%s", diff)
 			}
+			fmt.Print("\n\n\n-------\n\n\n")
 		})
+
 		return nil
 	})
 }
