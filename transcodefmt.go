@@ -63,7 +63,7 @@ func (y yamlnode) encodeMapping() ([]byte, error) {
 	}
 	b := []byte("{}")
 	for i := 0; i < len(y.Content); i += 2 {
-		k, err := yamlnode{y.Content[i]}.key()
+		k, err := yamlnode{y.Content[i]}.encodeKey()
 		if err != nil {
 			return nil, err
 		}
@@ -80,10 +80,14 @@ func (y yamlnode) encodeMapping() ([]byte, error) {
 	return b, nil
 }
 
-func (y yamlnode) key() (string, error) {
+func (y yamlnode) encodeKey() (string, error) {
 	switch y.Kind {
 	case yaml.ScalarNode:
-		return y.Value, nil
+		sd, err := json.Marshal(y.Value)
+		if err != nil {
+			return "", err
+		}
+		return string(sd), nil
 	default:
 		return "", fmt.Errorf("unknown node key kind: %d", y.Kind)
 	}

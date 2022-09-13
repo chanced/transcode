@@ -18,6 +18,9 @@ var testdata embed.FS
 
 func Test(t *testing.T) {
 	fs.WalkDir(testdata, ".", func(p string, d fs.DirEntry, err error) error {
+		if err != nil {
+			t.Fatal(t)
+		}
 		if d.IsDir() {
 			return nil
 		}
