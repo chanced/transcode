@@ -1,9 +1,11 @@
 package transcodefmt_test
 
 import (
+	"bytes"
 	"embed"
 	"encoding/json"
 	"io/fs"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -38,19 +40,7 @@ func Test(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			// jsonData, err := json.Marshal(expectedYAML)
-			// if err != nil {
-			// 	t.Fatal(err)
-			// }
-
-			// var expectedJSON interface{}
-
-			// err = json.Unmarshal(jsonData, &expectedJSON)
-			// if err != nil {
-			// 	t.Fatal(err)
-			// }
-
-			jsonData, err := transcodefmt.YAMLToJSON(yamlData)
+			jsonData, err := transcodefmt.JSONFromYAML(yamlData)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -61,19 +51,59 @@ func Test(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			yamlFromJSON, err := transcodefmt.JSONToYAML(jsonData)
+			yamlFromJSON, err := transcodefmt.YAMLFromJSON(jsonData)
+			if err != nil {
+				t.Error(err)
+			}
+			os.MkdirAll(filepath.Dir("testoutput/"+name), 0o755)
+			err = os.WriteFile("testoutput/"+name+".yaml", yamlFromJSON, 0o644)
 			if err != nil {
 				t.Fatal(err)
 			}
-
 			var actualYAML interface{}
 			err = yaml.Unmarshal(yamlFromJSON, &actualYAML)
 			if err != nil {
-				t.Fatal(err)
+				t.Error(err)
 			}
 
 			if diff := cmp.Diff(expectedYAML, actualYAML); diff != "" {
 				t.Errorf("yaml mismatch:\n%s", diff)
+			}
+
+			yamlr, err := testdata.Open(p)
+			if err != nil {
+				t.Fatal(err)
+			}
+			_ = yamlr
+
+			jsonr := bytes.NewBuffer(jsonData)
+			jsonbuf := bytes.Buffer{}
+			yamlbuf := bytes.Buffer{}
+
+			_ = jsonbuf
+			_ = yamlbuf
+
+			tr := transcodefmt.New(&yamlbuf)
+			if err = tr.YAMLFromJSON(jsonr); err != nil {
+				t.Error(err)
+			}
+
+			// err = os.WriteFile("testoutput/"+name+"_encoder.yaml", yamlbuf.Bytes(), 0o644)
+			// if err != nil {
+			// 	t.Fatal(err)
+			// }
+
+			if !cmp.Equal(yamlFromJSON, yamlbuf.Bytes()) {
+				t.Errorf("yaml mismatch:\n%s", cmp.Diff(yamlFromJSON, yamlbuf.Bytes()))
+			}
+
+			tr = transcodefmt.New(&jsonbuf)
+			err = tr.JSONFromYAML(&yamlbuf)
+			if err != nil {
+				t.Error(err)
+			}
+			if !cmp.Equal(jsonData, jsonbuf.Bytes()) {
+				t.Errorf("json mismatch: \n%s", cmp.Diff(jsonData, jsonbuf.Bytes()))
 			}
 		})
 		return nil

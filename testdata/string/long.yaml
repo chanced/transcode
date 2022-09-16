@@ -1,0 +1,144 @@
+clip-folded: >
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+    tempor incididunt ut labore et dolore magna aliqua. Ac felis donec et odio.
+    In nulla posuere sollicitudin aliquam. Volutpat lacus laoreet non curabitur
+    gravida arcu ac tortor dignissim. Tristique et egestas quis ipsum
+    suspendisse ultrices. Tincidunt arcu non sodales neque sodales ut. Rhoncus
+    aenean vel elit scelerisque mauris pellentesque pulvinar pellentesque. Augue
+    interdum velit euismod in. Euismod quis viverra nibh cras. Tortor posuere ac
+    ut consequat semper viverra nam libero. Porttitor massa id neque aliquam. Ut
+    etiam sit amet nisl purus in mollis nunc. In metus vulputate eu scelerisque
+    felis imperdiet proin fermentum leo. Tortor pretium viverra suspendisse
+    potenti nullam ac. Non diam phasellus vestibulum lorem sed risus ultricies
+    tristique nulla. Amet nisl suscipit adipiscing bibendum est ultricies
+    integer. Ac auctor augue mauris augue neque gravida in fermentum et. Mauris
+    nunc congue nisi vitae suscipit tellus mauris a diam.
+
+    Tincidunt tortor aliquam nulla facilisi cras. Urna id volutpat lacus
+    laoreet. Dictumst vestibulum rhoncus est pellentesque elit ullamcorper
+    dignissim cras tincidunt. Morbi tincidunt augue interdum velit euismod in
+    pellentesque. Sagittis aliquam malesuada bibendum arcu vitae elementum
+    curabitur vitae. Iaculis nunc sed augue lacus viverra vitae congue. Sem
+    integer vitae justo eget magna fermentum iaculis eu non. Turpis nunc eget
+    lorem dolor sed viverra ipsum nunc aliquet. Sit amet nulla facilisi morbi.
+    Eu consequat ac felis donec et.
+keep-folded: >+
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+    tempor incididunt ut labore et dolore magna aliqua. Ac felis donec et odio.
+    In nulla posuere sollicitudin aliquam. Volutpat lacus laoreet non curabitur
+    gravida arcu ac tortor dignissim. Tristique et egestas quis ipsum
+    suspendisse ultrices. Tincidunt arcu non sodales neque sodales ut. Rhoncus
+    aenean vel elit scelerisque mauris pellentesque pulvinar pellentesque. Augue
+    interdum velit euismod in. Euismod quis viverra nibh cras. Tortor posuere ac
+    ut consequat semper viverra nam libero. Porttitor massa id neque aliquam. Ut
+    etiam sit amet nisl purus in mollis nunc. In metus vulputate eu scelerisque
+    felis imperdiet proin fermentum leo. Tortor pretium viverra suspendisse
+    potenti nullam ac. Non diam phasellus vestibulum lorem sed risus ultricies
+    tristique nulla. Amet nisl suscipit adipiscing bibendum est ultricies
+    integer. Ac auctor augue mauris augue neque gravida in fermentum et. Mauris
+    nunc congue nisi vitae suscipit tellus mauris a diam.
+
+    Tincidunt tortor aliquam nulla facilisi cras. Urna id volutpat lacus
+    laoreet. Dictumst vestibulum rhoncus est pellentesque elit ullamcorper
+    dignissim cras tincidunt. Morbi tincidunt augue interdum velit euismod in
+    pellentesque. Sagittis aliquam malesuada bibendum arcu vitae elementum
+    curabitur vitae. Iaculis nunc sed augue lacus viverra vitae congue. Sem
+    integer vitae justo eget magna fermentum iaculis eu non. Turpis nunc eget
+    lorem dolor sed viverra ipsum nunc aliquet. Sit amet nulla facilisi morbi.
+    Eu consequat ac felis donec et.
+clip-literal: |
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+    tempor incididunt ut labore et dolore magna aliqua. Ac felis donec et odio.
+    In nulla posuere sollicitudin aliquam. Volutpat lacus laoreet non curabitur
+    gravida arcu ac tortor dignissim. Tristique et egestas quis ipsum
+    suspendisse ultrices. Tincidunt arcu non sodales neque sodales ut. Rhoncus
+    aenean vel elit scelerisque mauris pellentesque pulvinar pellentesque. Augue
+    interdum velit euismod in. Euismod quis viverra nibh cras. Tortor posuere ac
+    ut consequat semper viverra nam libero. Porttitor massa id neque aliquam. Ut
+    etiam sit amet nisl purus in mollis nunc. In metus vulputate eu scelerisque
+    felis imperdiet proin fermentum leo. Tortor pretium viverra suspendisse
+    potenti nullam ac. Non diam phasellus vestibulum lorem sed risus ultricies
+    tristique nulla. Amet nisl suscipit adipiscing bibendum est ultricies
+    integer. Ac auctor augue mauris augue neque gravida in fermentum et. Mauris
+    nunc congue nisi vitae suscipit tellus mauris a diam.
+
+    Tincidunt tortor aliquam nulla facilisi cras. Urna id volutpat lacus
+    laoreet. Dictumst vestibulum rhoncus est pellentesque elit ullamcorper
+    dignissim cras tincidunt. Morbi tincidunt augue interdum velit euismod in
+    pellentesque. Sagittis aliquam malesuada bibendum arcu vitae elementum
+    curabitur vitae. Iaculis nunc sed augue lacus viverra vitae congue. Sem
+    integer vitae justo eget magna fermentum iaculis eu non. Turpis nunc eget
+    lorem dolor sed viverra ipsum nunc aliquet. Sit amet nulla facilisi morbi.
+    Eu consequat ac felis donec et.
+strip-folded: >-
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+    tempor incididunt ut labore et dolore magna aliqua. Ac felis donec et odio.
+    In nulla posuere sollicitudin aliquam. Volutpat lacus laoreet non curabitur
+    gravida arcu ac tortor dignissim. Tristique et egestas quis ipsum
+    suspendisse ultrices. Tincidunt arcu non sodales neque sodales ut. Rhoncus
+    aenean vel elit scelerisque mauris pellentesque pulvinar pellentesque. Augue
+    interdum velit euismod in. Euismod quis viverra nibh cras. Tortor posuere ac
+    ut consequat semper viverra nam libero. Porttitor massa id neque aliquam. Ut
+    etiam sit amet nisl purus in mollis nunc. In metus vulputate eu scelerisque
+    felis imperdiet proin fermentum leo. Tortor pretium viverra suspendisse
+    potenti nullam ac. Non diam phasellus vestibulum lorem sed risus ultricies
+    tristique nulla. Amet nisl suscipit adipiscing bibendum est ultricies
+    integer. Ac auctor augue mauris augue neque gravida in fermentum et. Mauris
+    nunc congue nisi vitae suscipit tellus mauris a diam.
+
+    Tincidunt tortor aliquam nulla facilisi cras. Urna id volutpat lacus
+    laoreet. Dictumst vestibulum rhoncus est pellentesque elit ullamcorper
+    dignissim cras tincidunt. Morbi tincidunt augue interdum velit euismod in
+    pellentesque. Sagittis aliquam malesuada bibendum arcu vitae elementum
+    curabitur vitae. Iaculis nunc sed augue lacus viverra vitae congue. Sem
+    integer vitae justo eget magna fermentum iaculis eu non. Turpis nunc eget
+    lorem dolor sed viverra ipsum nunc aliquet. Sit amet nulla facilisi morbi.
+    Eu consequat ac felis donec et.
+strip-literal: |-
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+    tempor incididunt ut labore et dolore magna aliqua. Ac felis donec et odio.
+    In nulla posuere sollicitudin aliquam. Volutpat lacus laoreet non curabitur
+    gravida arcu ac tortor dignissim. Tristique et egestas quis ipsum
+    suspendisse ultrices. Tincidunt arcu non sodales neque sodales ut. Rhoncus
+    aenean vel elit scelerisque mauris pellentesque pulvinar pellentesque. Augue
+    interdum velit euismod in. Euismod quis viverra nibh cras. Tortor posuere ac
+    ut consequat semper viverra nam libero. Porttitor massa id neque aliquam. Ut
+    etiam sit amet nisl purus in mollis nunc. In metus vulputate eu scelerisque
+    felis imperdiet proin fermentum leo. Tortor pretium viverra suspendisse
+    potenti nullam ac. Non diam phasellus vestibulum lorem sed risus ultricies
+    tristique nulla. Amet nisl suscipit adipiscing bibendum est ultricies
+    integer. Ac auctor augue mauris augue neque gravida in fermentum et. Mauris
+    nunc congue nisi vitae suscipit tellus mauris a diam.
+
+    Tincidunt tortor aliquam nulla facilisi cras. Urna id volutpat lacus
+    laoreet. Dictumst vestibulum rhoncus est pellentesque elit ullamcorper
+    dignissim cras tincidunt. Morbi tincidunt augue interdum velit euismod in
+    pellentesque. Sagittis aliquam malesuada bibendum arcu vitae elementum
+    curabitur vitae. Iaculis nunc sed augue lacus viverra vitae congue. Sem
+    integer vitae justo eget magna fermentum iaculis eu non. Turpis nunc eget
+    lorem dolor sed viverra ipsum nunc aliquet. Sit amet nulla facilisi morbi.
+    Eu consequat ac felis donec et.
+keep-literal: |+
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+    tempor incididunt ut labore et dolore magna aliqua. Ac felis donec et odio.
+    In nulla posuere sollicitudin aliquam. Volutpat lacus laoreet non curabitur
+    gravida arcu ac tortor dignissim. Tristique et egestas quis ipsum
+    suspendisse ultrices. Tincidunt arcu non sodales neque sodales ut. Rhoncus
+    aenean vel elit scelerisque mauris pellentesque pulvinar pellentesque. Augue
+    interdum velit euismod in. Euismod quis viverra nibh cras. Tortor posuere ac
+    ut consequat semper viverra nam libero. Porttitor massa id neque aliquam. Ut
+    etiam sit amet nisl purus in mollis nunc. In metus vulputate eu scelerisque
+    felis imperdiet proin fermentum leo. Tortor pretium viverra suspendisse
+    potenti nullam ac. Non diam phasellus vestibulum lorem sed risus ultricies
+    tristique nulla. Amet nisl suscipit adipiscing bibendum est ultricies
+    integer. Ac auctor augue mauris augue neque gravida in fermentum et. Mauris
+    nunc congue nisi vitae suscipit tellus mauris a diam.
+
+    Tincidunt tortor aliquam nulla facilisi cras. Urna id volutpat lacus
+    laoreet. Dictumst vestibulum rhoncus est pellentesque elit ullamcorper
+    dignissim cras tincidunt. Morbi tincidunt augue interdum velit euismod in
+    pellentesque. Sagittis aliquam malesuada bibendum arcu vitae elementum
+    curabitur vitae. Iaculis nunc sed augue lacus viverra vitae congue. Sem
+    integer vitae justo eget magna fermentum iaculis eu non. Turpis nunc eget
+    lorem dolor sed viverra ipsum nunc aliquet. Sit amet nulla facilisi morbi.
+    Eu consequat ac felis donec et.

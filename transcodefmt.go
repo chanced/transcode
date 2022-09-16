@@ -1,128 +1,221 @@
 package transcodefmt
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
-	"strings"
+	"io"
+	"sync"
 
 	"github.com/tidwall/gjson"
-	"github.com/tidwall/sjson"
 	yaml "gopkg.in/yaml.v3"
 )
 
-const indention string = "    "
+var bufPool = sync.Pool{
+	New: func() any {
+		return new(bytes.Buffer)
+	},
+}
 
-func YAMLToJSON(yamlData []byte) ([]byte, error) {
+var (
+	newline      = []byte{'\n'}
+	quotation    = []byte{'"'}
+	comma        = []byte{','}
+	leftBracket  = []byte{'['}
+	rightBracket = []byte{']'}
+	leftCurly    = []byte{'{'}
+	rightCurly   = []byte{'}'}
+	colon        = []byte{':'}
+)
+
+func New(w io.Writer) Transcoder {
+	return Transcoder{
+		w:      w,
+		Indent: 4,
+	}
+}
+
+type Transcoder struct {
+	Indent  int
+	w       io.Writer
+	written bool
+}
+
+// JSONFromYAML transcodes YAML contained in yamlData
+//
+// Multiple documents are not supported.
+func (t Transcoder) JSONFromYAML(yamlData io.Reader) error {
+	dec := yaml.NewDecoder(yamlData)
+	var n yaml.Node
+	if err := dec.Decode(&n); err != nil {
+		return err
+	}
+	yn := yamlnode{&n}
+	return yn.encode(t.w)
+}
+
+// YAMLFromJSON transcodes JSON contained in jsonData into YAML
+//
+// Transcoding multiple items are not supported. Each root record will be seperated
+// by "---"
+func (t Transcoder) YAMLFromJSON(jsonData io.Reader) error {
+	var o json.RawMessage
+	dec := json.NewDecoder(jsonData)
+	dec.UseNumber()
+
+	if err := dec.Decode(&o); err != nil {
+		return err
+	}
+
+	in := bytes.Repeat([]byte{' '}, t.Indent)
+	err := jsonnode(o).encode(t.w, gjson.ParseBytes(o), 0, in)
+	if err != nil {
+		return err
+	}
+	for dec.More() {
+		t.w.Write(newline)
+		t.w.Write([]byte("---"))
+		t.w.Write(newline)
+		if err := dec.Decode(&o); err != nil {
+			return err
+		}
+		err = jsonnode(o).encode(t.w, gjson.ParseBytes(o), 0, in)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func JSONFromYAML(yamlData []byte) ([]byte, error) {
 	var yn yaml.Node
 	err := yaml.Unmarshal(yamlData, &yn)
 	if err != nil {
 		return nil, err
 	}
 	y := yamlnode{&yn}
-	return y.MarshalJSON()
+	b := bytes.Buffer{}
+	if err = y.EncodeJSON(&b); err != nil {
+		return nil, err
+	}
+	return b.Bytes(), nil
 }
 
-func JSONToYAML(jsonData []byte) ([]byte, error) {
+func YAMLFromJSON(jsonData []byte) ([]byte, error) {
 	// going to do this twice to improve formatting
 	return jsonnode(jsonData).MarshalYAML()
 }
 
 type yamlnode struct{ *yaml.Node }
 
-func (y yamlnode) MarshalJSON() ([]byte, error) {
-	return y.encode()
+func (y yamlnode) EncodeJSON(w io.Writer) error {
+	return y.encode(w)
 }
 
-func (y yamlnode) encode() ([]byte, error) {
+func (y yamlnode) encode(w io.Writer) error {
 	switch y.Kind {
 	case yaml.DocumentNode:
-		return y.encodeDocument()
+		return y.encodeDocument(w)
 	case yaml.ScalarNode:
-		return y.encodeScalar()
+		return y.encodeScalar(w)
 	case yaml.SequenceNode:
-		return y.encodeSequence()
+		return y.encodeSequence(w)
 	case yaml.MappingNode:
-		return y.encodeMapping()
+		return y.encodeMapping(w)
 	case yaml.AliasNode:
-		return nil, fmt.Errorf("aliases are not currently supported")
+		return fmt.Errorf("aliases are not currently supported")
 	default:
-		return nil, fmt.Errorf("unknown node kind: %d", y.Kind)
+		return fmt.Errorf("unknown node kind: %d", y.Kind)
 	}
 }
 
-func (y yamlnode) encodeDocument() ([]byte, error) {
+func (y yamlnode) encodeDocument(w io.Writer) error {
 	for _, v := range y.Content {
-		return yamlnode{v}.MarshalJSON()
+		return yamlnode{v}.EncodeJSON(w)
 	}
-	return nil, nil
+	return nil
 }
 
-func (y yamlnode) encodeMapping() ([]byte, error) {
+func (y yamlnode) encodeMapping(w io.Writer) error {
 	if len(y.Content)%2 != 0 {
-		return nil, fmt.Errorf("mapping node has odd number of children")
+		return fmt.Errorf("mapping node has odd number of children")
 	}
-	b := []byte("{}")
+	w.Write(leftCurly)
+	var err error
+	var k []byte
 	for i := 0; i < len(y.Content); i += 2 {
-		k, err := yamlnode{y.Content[i]}.encodeKey()
-		if err != nil {
-			return nil, err
+		if i > 0 {
+			w.Write(comma)
 		}
-		v, err := yamlnode{y.Content[i+1]}.encode()
+		k, err = yamlnode{y.Content[i]}.encodeKey()
 		if err != nil {
-			return nil, err
+			return err
 		}
-		b, err = sjson.SetRawBytes(b, string(k), v)
+		w.Write(k)
+		w.Write(colon)
+		err := yamlnode{y.Content[i+1]}.encode(w)
 		if err != nil {
-			return nil, err
+			return err
 		}
 	}
-
-	return b, nil
+	w.Write(rightCurly)
+	return nil
 }
 
-func (y yamlnode) encodeKey() (string, error) {
+func (y yamlnode) encodeKey() ([]byte, error) {
 	switch y.Kind {
 	case yaml.ScalarNode:
 		sd, err := json.Marshal(y.Value)
 		if err != nil {
-			return "", err
+			return nil, err
 		}
-		return string(sd), nil
+		return sd, nil
 	default:
-		return "", fmt.Errorf("unknown node key kind: %d", y.Kind)
+		return nil, fmt.Errorf("unknown node key kind: %d", y.Kind)
 	}
 }
 
-func (y yamlnode) encodeSequence() ([]byte, error) {
-	var x []byte
-	b := []byte("[]")
+func (y yamlnode) encodeSequence(w io.Writer) error {
+	w.Write(leftBracket)
 	var err error
-	for _, v := range y.Content {
-		x, err = yamlnode{v}.encode()
-		if err != nil {
-			return nil, err
-		}
-		b, err = sjson.SetRawBytes(b, "-1", x)
 
+	for i, v := range y.Content {
+		if i > 0 {
+			w.Write(comma)
+		}
+		err = yamlnode{v}.encode(w)
 		if err != nil {
-			return nil, err
+			return err
 		}
 	}
-	return b, nil
+	w.Write(rightBracket)
+	return nil
 }
 
-func (y yamlnode) encodeScalar() ([]byte, error) {
+func (y yamlnode) encodeScalar(w io.Writer) error {
 	switch y.Tag {
 	case "!!str":
-		return y.encodeString()
+		b, err := y.encodeString()
+		if err != nil {
+			return err
+		}
+		_, err = w.Write(b)
+		return err
 	case "!!int", "!!float":
-		return y.encodeNumber()
+		b, err := y.encodeNumber()
+		if err != nil {
+			return err
+		}
+		_, err = w.Write(b)
+		return err
 	case "!!bool":
-		return []byte(y.Value), nil
+		w.Write([]byte(y.Value))
+		return nil
 	case "!!null":
-		return []byte("null"), nil
+		w.Write([]byte("null"))
+		return nil
 	}
-	return nil, fmt.Errorf("unknown scalar tag: %q", y.Tag)
+	return fmt.Errorf("unknown scalar tag: %q", y.Tag)
 }
 
 func (y yamlnode) encodeString() ([]byte, error) {
@@ -140,87 +233,133 @@ type jsonnode json.RawMessage
 
 // MarshalYAML implements yaml.BytesMarshaler
 func (j jsonnode) MarshalYAML() ([]byte, error) {
-	r := gjson.ParseBytes(j)
-	return j.encode(r, 0)
+	b := bufPool.Get().(*bytes.Buffer)
+	b.Reset()
+	err := j.EncodeYAML(b)
+	if err != nil {
+		return nil, err
+	}
+	bufPool.Put(b)
+	return b.Bytes(), nil
 }
 
-func (j jsonnode) encode(r gjson.Result, indent int) ([]byte, error) {
+func (j jsonnode) EncodeYAML(w io.Writer) error {
+	return j.encode(w, gjson.ParseBytes(j), 0, []byte("    "))
+}
+
+func (j jsonnode) encode(w io.Writer, r gjson.Result, indent int, indention []byte) error {
 	switch r.Type {
 	case gjson.Null:
-		return []byte("null"), nil
+		w.Write([]byte("null"))
+		return nil
 	case gjson.False:
-		return []byte("false"), nil
+		w.Write([]byte("false"))
+		return nil
 	case gjson.True:
-		return []byte("true"), nil
+		w.Write([]byte("true"))
+		return nil
 	case gjson.Number:
-		return []byte(r.Raw), nil
+		w.Write([]byte(r.Raw))
 	case gjson.String:
-		return j.encodeString(r, indent)
+		return j.encodeString(w, []byte(r.String()), indent, indention)
 	}
-
 	if r.IsArray() {
-		return j.encodeArray(r, indent)
+		return j.encodeArray(w, r, indent, indention)
 	}
-
 	if r.IsObject() {
-		return j.encodeObject(r, indent)
+		return j.encodeObject(w, r, indent, indention)
 	}
-	return nil, nil
+	return nil
 }
 
-func (j jsonnode) encodeObject(r gjson.Result, indent int) ([]byte, error) {
-	b := strings.Builder{}
+func isBool(k []byte) bool {
+	return bytes.Equal(k, []byte("true")) || bytes.Equal(k, []byte("false"))
+}
+
+func isYesNo(k []byte) bool {
+	return bytes.Equal(k, []byte("yes")) || bytes.Equal(k, []byte("no"))
+}
+
+func writeYAMLKey(w io.Writer, k []byte) {
+	quote := isNumber(k) || isBool(k) || isYesNo(k)
+	if quote {
+		w.Write(quotation)
+	}
+	w.Write(k)
+	if quote {
+		w.Write(quotation)
+	}
+}
+
+func (j jsonnode) encodeObject(w io.Writer, r gjson.Result, indent int, indention []byte) error {
 	var err error
-	var x []byte
+	// x := bufPool.Get().(*bytes.Buffer)
+	// defer bufPool.Put(x)
+	i := 0
+	dn := bytes.Repeat(indention, indent)
 	r.ForEach(func(key, value gjson.Result) bool {
-		if b.Len() > 0 || indent > 0 {
-			b.WriteByte('\n')
-			for i := 0; i < indent; i++ {
-				b.WriteString(indention)
-			}
+		if i > 0 || indent > 0 {
+			w.Write(newline)
+			w.Write(dn)
 		}
-		b.WriteString(key.String())
+		i += 1
 
-		b.WriteByte(':')
-		b.WriteByte(' ')
-		x, err = j.encode(value, indent+1)
+		writeYAMLKey(w, []byte(key.String()))
+		w.Write([]byte(": "))
+
+		err = j.encode(w, value, indent+1, indention)
 		if err != nil {
 			return false
 		}
-		_, err = b.Write(x)
+
 		return err == nil
 	})
-	return []byte(b.String()), err
+
+	return nil
 }
 
-func (j jsonnode) encodeArray(r gjson.Result, indent int) ([]byte, error) {
-	b := strings.Builder{}
+func (j jsonnode) encodeArray(w io.Writer, r gjson.Result, indent int, indention []byte) error {
 	var err error
-	var x []byte
+	i := 0
+	dn := bytes.Repeat(indention, indent)
 	r.ForEach(func(_, value gjson.Result) bool {
-		if b.Len() > 0 || indent > 0 {
-			b.WriteByte('\n')
-			for i := 0; i < indent; i++ {
-				b.WriteString(indention)
-			}
+		if i > 0 || indent > 0 {
+			w.Write([]byte("\n"))
+			w.Write(dn)
 		}
-		b.WriteString("- ")
-		x, err = j.encode(value, indent+1)
+		i += 1
+		w.Write([]byte("- "))
+		err = j.encode(w, value, indent+1, indention)
 		if err != nil {
 			return false
 		}
-		_, err = b.Write(x)
 		return err == nil
 	})
-	return []byte(b.String()), err
+	return nil
 }
 
-func (j jsonnode) encodeString(r gjson.Result, indent int) ([]byte, error) {
-	return json.Marshal(r.String())
-	// newlineIndex := strings.Index(s, "\n")
-	// if newlineIndex == -1 {
-	// 	return json.Marshal(s)
-	// }
+func (j jsonnode) encodeString(w io.Writer, d []byte, indent int, indention []byte) error {
+	switch {
+	case isNumber(d) || isBool(d) || isYesNo(d) || bytes.ContainsAny(d, "\t#"):
+		w.Write(quotation)
+		w.Write(d)
+		w.Write(quotation)
+	case bytes.ContainsAny(d, "\n"):
+		in := bytes.Repeat(indention, indent)
+		w.Write([]byte{'|'})
+		if !bytes.HasSuffix(d, []byte("\n")) {
+			w.Write([]byte{'-'})
+		}
+		s := bytes.Split(d, []byte("\n"))
+		for _, l := range s {
+			w.Write(newline)
+			w.Write(in)
+			w.Write(l)
+		}
+	default:
+		w.Write(d)
+	}
+	return nil
 }
 
 // func (j jsonnode) encodeStringBlock(r gjson.Result, indent int) ([]byte, error) {

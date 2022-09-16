@@ -16,9 +16,6 @@ servers:
 
 paths:
     /generic:
-        # parameters:
-        #   - name: objparam
-        #     style:
         post:
             operationId: createGenericMap
             requestBody:
