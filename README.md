@@ -12,9 +12,8 @@ result in `map[interface{}]interface{}`. When you need to work with the raw data
 or would like to work with JSON Schema, this can be problematic.
 
 Encoding JSON as YAML is easily accomplishable with standard tooling. However,
-this library will be much faster than marshaling the JSON, unmarshaling into
-`interface{}`, and then remarshaling as YAML. It also provides some very minimal
-formatting.
+this library will be faster than unmarshaling JSON as `interface{}`, and then
+remarshaling as YAML. It also provides some very minimal formatting.
 
 There are some drawbacks to using transcode though:
 
