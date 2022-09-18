@@ -1,5 +1,7 @@
 # transcode is markup language conversion library
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/chanced/transcode.svg)](https://pkg.go.dev/github.com/chanced/transcode)
+
 transcode is a go library that will convert markup languages (currently JSON and YAML) from one form to another.
 
 ## Motivation
