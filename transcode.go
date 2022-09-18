@@ -1,3 +1,5 @@
+// Package transcode is a library that will convert markup languages (currently
+// JSON and YAML) from one form to another.
 package transcode
 
 import (
