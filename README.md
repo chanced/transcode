@@ -18,7 +18,7 @@ remarshaling as YAML. It also provides some very minimal formatting.
 There are some drawbacks to using transcode though:
 
 -   YAML aliases are not supported
--   All keys are converted to strings when transcoding into YAML
+-   All keys remain strings when transcoding into YAML
 -   YAML comments are obviously lost
 
 ## License
