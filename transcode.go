@@ -96,8 +96,12 @@ func JSONFromYAML(yamlData []byte) ([]byte, error) {
 		return nil, err
 	}
 	y := yamlnode{&yn}
-	b := bytes.Buffer{}
-	if err = y.EncodeJSON(&b); err != nil {
+	b := bufPool.Get().(*bytes.Buffer)
+	defer bufPool.Put(b)
+	b.Reset()
+	b.Grow(len(yamlData))
+
+	if err = y.EncodeJSON(b); err != nil {
 		return nil, err
 	}
 	return b.Bytes(), nil
@@ -237,11 +241,12 @@ type jsonnode json.RawMessage
 func (j jsonnode) MarshalYAML() ([]byte, error) {
 	b := bufPool.Get().(*bytes.Buffer)
 	b.Reset()
+	defer bufPool.Put(b)
+	b.Grow(len(j) * 2)
 	err := j.EncodeYAML(b)
 	if err != nil {
 		return nil, err
 	}
-	bufPool.Put(b)
 	return b.Bytes(), nil
 }
 
@@ -301,8 +306,6 @@ func writeIndention(w io.Writer, s []byte, i int) {
 
 func (j jsonnode) encodeObject(w io.Writer, r gjson.Result, indent int, indention []byte) error {
 	var err error
-	// x := bufPool.Get().(*bytes.Buffer)
-	// defer bufPool.Put(x)
 	i := 0
 	r.ForEach(func(key, value gjson.Result) bool {
 		if i > 0 || indent > 0 {
