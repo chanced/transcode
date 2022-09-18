@@ -1,4 +1,4 @@
-package transcodefmt
+package transcode
 
 import (
 	"bytes"
@@ -291,16 +291,21 @@ func writeYAMLKey(w io.Writer, k []byte) {
 	}
 }
 
+func writeIndention(w io.Writer, s []byte, i int) {
+	for j := 0; j < i; j++ {
+		w.Write(s)
+	}
+}
+
 func (j jsonnode) encodeObject(w io.Writer, r gjson.Result, indent int, indention []byte) error {
 	var err error
 	// x := bufPool.Get().(*bytes.Buffer)
 	// defer bufPool.Put(x)
 	i := 0
-	dn := bytes.Repeat(indention, indent)
 	r.ForEach(func(key, value gjson.Result) bool {
 		if i > 0 || indent > 0 {
 			w.Write(newline)
-			w.Write(dn)
+			writeIndention(w, indention, indent)
 		}
 		i += 1
 
@@ -321,11 +326,11 @@ func (j jsonnode) encodeObject(w io.Writer, r gjson.Result, indent int, indentio
 func (j jsonnode) encodeArray(w io.Writer, r gjson.Result, indent int, indention []byte) error {
 	var err error
 	i := 0
-	dn := bytes.Repeat(indention, indent)
+
 	r.ForEach(func(_, value gjson.Result) bool {
 		if i > 0 || indent > 0 {
 			w.Write([]byte("\n"))
-			w.Write(dn)
+			writeIndention(w, indention, indent)
 		}
 		i += 1
 		w.Write([]byte("- "))
@@ -344,8 +349,8 @@ func (j jsonnode) encodeString(w io.Writer, d []byte, indent int, indention []by
 		w.Write(quotation)
 		w.Write(d)
 		w.Write(quotation)
+		return nil
 	case bytes.ContainsAny(d, "\n"):
-		in := bytes.Repeat(indention, indent)
 		w.Write([]byte{'|'})
 		if !bytes.HasSuffix(d, []byte("\n")) {
 			w.Write([]byte{'-'})
@@ -353,13 +358,14 @@ func (j jsonnode) encodeString(w io.Writer, d []byte, indent int, indention []by
 		s := bytes.Split(d, []byte("\n"))
 		for _, l := range s {
 			w.Write(newline)
-			w.Write(in)
+			writeIndention(w, indention, indent+1)
 			w.Write(l)
 		}
+		return nil
 	default:
 		w.Write(d)
+		return nil
 	}
-	return nil
 }
 
 // func (j jsonnode) encodeStringBlock(r gjson.Result, indent int) ([]byte, error) {

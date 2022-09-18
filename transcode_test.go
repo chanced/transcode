@@ -1,4 +1,4 @@
-package transcodefmt_test
+package transcode_test
 
 import (
 	"bytes"
@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/chanced/transcodefmt"
+	"github.com/chanced/transcode"
 	"github.com/google/go-cmp/cmp"
 	"gopkg.in/yaml.v3"
 )
@@ -40,7 +40,7 @@ func Test(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			jsonData, err := transcodefmt.JSONFromYAML(yamlData)
+			jsonData, err := transcode.JSONFromYAML(yamlData)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -51,7 +51,7 @@ func Test(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			yamlFromJSON, err := transcodefmt.YAMLFromJSON(jsonData)
+			yamlFromJSON, err := transcode.YAMLFromJSON(jsonData)
 			if err != nil {
 				t.Error(err)
 			}
@@ -83,7 +83,7 @@ func Test(t *testing.T) {
 			_ = jsonbuf
 			_ = yamlbuf
 
-			tr := transcodefmt.New(&yamlbuf)
+			tr := transcode.New(&yamlbuf)
 			if err = tr.YAMLFromJSON(jsonr); err != nil {
 				t.Error(err)
 			}
@@ -97,7 +97,7 @@ func Test(t *testing.T) {
 				t.Errorf("yaml mismatch:\n%s", cmp.Diff(yamlFromJSON, yamlbuf.Bytes()))
 			}
 
-			tr = transcodefmt.New(&jsonbuf)
+			tr = transcode.New(&jsonbuf)
 			err = tr.JSONFromYAML(&yamlbuf)
 			if err != nil {
 				t.Error(err)

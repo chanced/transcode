@@ -1,4 +1,4 @@
-module github.com/chanced/transcodefmt
+module github.com/chanced/transcode
 
 go 1.18
 
