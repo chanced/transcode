@@ -1,11 +1,24 @@
-# transcode is a yaml/json conversion library
+# transcode is markup language conversion library
 
-transcode encodes yaml into json and vice versa while preserving the order and structure of the data.
+transcode is a go library that will convert markup languages (currently JSON and YAML) from one form to another.
 
--   aliases are not supported
--   comments are obviously lost
+## Motivation
 
-Please feel free to open issues or contribute if you feel so inclined.
+While it is possible to decode JSON as YAML, doing so comes with caveats. YAML
+is a superset of JSON and so unmarshaling a YAML object into `interface{}` will
+result in `map[interface{}]interface{}`. When you need to work with the raw data
+or would like to work with JSON Schema, this can be problematic.
+
+Encoding JSON as YAML is easily accomplishable with standard tooling. However,
+this library will be much faster than marshaling the JSON, unmarshaling into
+`interface{}`, and then remarshaling as YAML. It also provides some very minimal
+formatting.
+
+There are some drawbacks to using transcode though:
+
+-   YAML aliases are not supported
+-   All keys are converted to strings when transcoding into YAML
+-   YAML comments are obviously lost
 
 ## License
 
