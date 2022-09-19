@@ -350,7 +350,7 @@ func (j jsonnode) encodeArray(w io.Writer, r gjson.Result, indent int, indention
 
 func (j jsonnode) encodeString(w io.Writer, d []byte, indent int, indention []byte) error {
 	switch {
-	case isNumber(d) || isBool(d) || isYesNo(d) || bytes.ContainsAny(d, "\t#"):
+	case isNumber(d) || isBool(d) || isYesNo(d) || bytes.ContainsAny(d, "\t#\\n"):
 		w.Write(quotation)
 		w.Write(d)
 		w.Write(quotation)
