@@ -7,17 +7,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"sync"
 
 	"github.com/tidwall/gjson"
 	yaml "gopkg.in/yaml.v3"
 )
-
-var bufPool = sync.Pool{
-	New: func() any {
-		return new(bytes.Buffer)
-	},
-}
 
 var (
 	newline      = []byte{'\n'}
@@ -96,9 +89,7 @@ func JSONFromYAML(yamlData []byte) ([]byte, error) {
 		return nil, err
 	}
 	y := yamlnode{&yn}
-	b := bufPool.Get().(*bytes.Buffer)
-	defer bufPool.Put(b)
-	b.Reset()
+	b := bytes.NewBuffer(nil)
 	b.Grow(len(yamlData))
 
 	if err = y.EncodeJSON(b); err != nil {
@@ -225,7 +216,7 @@ func (y yamlnode) encodeScalar(w io.Writer) error {
 }
 
 func (y yamlnode) encodeString() ([]byte, error) {
-	return json.Marshal(y.Value)
+	return json.Marshal(y.Node.Value)
 }
 
 func (y yamlnode) encodeNumber() ([]byte, error) {
@@ -239,9 +230,7 @@ type jsonnode json.RawMessage
 
 // MarshalYAML implements yaml.BytesMarshaler
 func (j jsonnode) MarshalYAML() ([]byte, error) {
-	b := bufPool.Get().(*bytes.Buffer)
-	b.Reset()
-	defer bufPool.Put(b)
+	b := bytes.NewBuffer(nil)
 	b.Grow(len(j) * 2)
 	err := j.EncodeYAML(b)
 	if err != nil {
@@ -350,25 +339,64 @@ func (j jsonnode) encodeArray(w io.Writer, r gjson.Result, indent int, indention
 
 func (j jsonnode) encodeString(w io.Writer, d []byte, indent int, indention []byte) error {
 	switch {
-	case isNumber(d) || isBool(d) || isYesNo(d) || bytes.ContainsAny(d, "\t#\\n"):
+	case isNumber(d) || isBool(d) || isYesNo(d) || bytes.ContainsAny(d, "#\t\n\a\b\\\t\n\f\r\v\\'"):
 		w.Write(quotation)
-		w.Write(d)
+		for _, r := range d {
+			switch r {
+			case '\a':
+				w.Write([]byte("\\a"))
+			case '\b':
+				w.Write([]byte("\\b"))
+			case '\\':
+				w.Write([]byte("\\\\"))
+			case '\t':
+				w.Write([]byte("\\t"))
+			case '\n':
+				w.Write([]byte("\\n"))
+			case '\f':
+				w.Write([]byte("\\f"))
+			case '\r':
+				w.Write([]byte("\\r"))
+			case '\v':
+				w.Write([]byte("\\v"))
+			case '\'':
+				w.Write([]byte("\\'"))
+			case '"':
+				w.Write([]byte("\\\""))
+			default:
+				w.Write([]byte{r})
+			}
+		}
 		w.Write(quotation)
-		return nil
-	case bytes.ContainsAny(d, "\n"):
-		w.Write([]byte{'|'})
-		if !bytes.HasSuffix(d, []byte("\n")) {
-			w.Write([]byte{'-'})
-		}
-		s := bytes.Split(d, []byte("\n"))
-		for _, l := range s {
-			w.Write(newline)
-			writeIndention(w, indention, indent+1)
-			w.Write(l)
-		}
 		return nil
 	default:
-		w.Write(d)
+		// w.Write([]byte(strings.ReplaceAll(string(d), "\n", `\n`)))
+		for _, r := range d {
+			switch r {
+			case '\a':
+				w.Write([]byte("\\a"))
+			case '\b':
+				w.Write([]byte("\\b"))
+			case '\\':
+				w.Write([]byte("\\\\"))
+			case '\t':
+				w.Write([]byte("\\t"))
+			case '\n':
+				w.Write([]byte("\\n"))
+			case '\f':
+				w.Write([]byte("\\f"))
+			case '\r':
+				w.Write([]byte("\\r"))
+			case '\v':
+				w.Write([]byte("\\v"))
+			case '\'':
+				w.Write([]byte("\\'"))
+			case '"':
+				w.Write([]byte("\\\""))
+			default:
+				w.Write([]byte{r})
+			}
+		}
 		return nil
 	}
 }
