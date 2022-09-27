@@ -216,7 +216,7 @@ func (y yamlnode) encodeScalar(w io.Writer) error {
 }
 
 func (y yamlnode) encodeString() ([]byte, error) {
-	return json.Marshal(y.Node.Value)
+	return json.Marshal(y.Value)
 }
 
 func (y yamlnode) encodeNumber() ([]byte, error) {
@@ -339,7 +339,7 @@ func (j jsonnode) encodeArray(w io.Writer, r gjson.Result, indent int, indention
 
 func (j jsonnode) encodeString(w io.Writer, d []byte, indent int, indention []byte) error {
 	switch {
-	case isNumber(d) || isBool(d) || isYesNo(d) || bytes.ContainsAny(d, "#\t\n\a\b\\\t\n\f\r\v\\'"):
+	case isNumber(d) || isBool(d) || isYesNo(d) || bytes.ContainsAny(d, ":#\t\n\a\b\\\t\n\f\r\v\\'"):
 		w.Write(quotation)
 		for _, r := range d {
 			switch r {

@@ -88,10 +88,10 @@ func Test(t *testing.T) {
 				t.Error(err)
 			}
 
-			// err = os.WriteFile("testoutput/"+name+"_encoder.yaml", yamlbuf.Bytes(), 0o644)
-			// if err != nil {
-			// 	t.Fatal(err)
-			// }
+			err = os.WriteFile("testoutput/"+name+"_encoder.yaml", yamlbuf.Bytes(), 0o644)
+			if err != nil {
+				t.Fatal(err)
+			}
 
 			if !cmp.Equal(yamlFromJSON, yamlbuf.Bytes()) {
 				t.Errorf("yaml mismatch:\n%s", cmp.Diff(yamlFromJSON, yamlbuf.Bytes()))
